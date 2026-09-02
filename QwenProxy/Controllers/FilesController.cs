@@ -13,12 +13,17 @@ namespace QwenProxy.Controllers;
 public sealed class FilesController : ControllerBase
 {
     private readonly CookieStore _cookieStore;
+    private readonly ITokenEncryptionService _encryption;
 
-    public FilesController(CookieStore cookieStore) => _cookieStore = cookieStore;
+    public FilesController(CookieStore cookieStore, ITokenEncryptionService encryption)
+    {
+        _cookieStore = cookieStore;
+        _encryption = encryption;
+    }
 
     /// <summary>Upload text content as a file.</summary>
     [HttpPost("upload")]
-    public async Task<ActionResult<UploadFileResponse>> UploadFileContent(
+    public async Task<IActionResult> UploadFileContent(
         [FromBody] UploadFileContentRequest body, CancellationToken ct)
     {
         string token = TokenSupport.ExtractToken(HttpContext);
@@ -27,13 +32,9 @@ public sealed class FilesController : ControllerBase
             var fileObj = await QwenFileUpload.UploadFileContentAsync(
                 body.Content, body.Filename, token, ct);
 
-            return new UploadFileResponse
-            {
-                File = fileObj,
-                Url = fileObj["url"]?.GetValue<string>() ?? "",
-                Filename = fileObj["name"]?.GetValue<string>() ?? body.Filename,
-                Size = fileObj["size"]?.GetValue<long>() ?? 0,
-            };
+            string encryptedFileId = _encryption.Encrypt(fileObj.ToJsonString());
+
+            return new JsonResult(new { fileId = encryptedFileId });
         }
         catch (Exception e) when (e is not HttpApiException)
         {
@@ -54,7 +55,10 @@ public sealed class FilesController : ControllerBase
             await using var ms = new MemoryStream();
             await file.CopyToAsync(ms, ct);
             var fileObj = await client.UploadImageAsync(ms.ToArray(), filename, ct);
-            return new JsonResult(fileObj);
+
+            string encryptedFileId = _encryption.Encrypt(fileObj.ToJsonString());
+
+            return new JsonResult(new { fileId = encryptedFileId });
         }
         catch (HttpRequestException e)
         {

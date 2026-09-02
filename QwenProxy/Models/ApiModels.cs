@@ -59,8 +59,8 @@ public sealed class SendPromptRequest
     [JsonPropertyName("parent_message_id")]
     public string? ParentMessageId { get; set; }
 
-    [JsonPropertyName("files")]
-    public List<FileAttachment>? Files { get; set; }
+    [JsonPropertyName("file_ids")]
+    public List<string>? FileIds { get; set; }
 
     [JsonPropertyName("model")]
     public string Model { get; set; } = "qwen3.8-max";
@@ -145,6 +145,9 @@ public sealed class UploadFileResponse
 {
     [JsonPropertyName("file")]
     public JsonNode? File { get; set; }
+
+    [JsonPropertyName("file_id")]
+    public string FileId { get; set; } = "";
 
     [JsonPropertyName("url")]
     public string Url { get; set; } = "";

@@ -38,64 +38,37 @@ public sealed class ChatCompletionsController : ControllerBase
     }
 
     /// <summary>
-    /// Convert FileAttachment entries into upstream-ready dicts.
-    ///  - Entries with a real 'url' pass through unchanged (plus any extra fields).
-    ///  - Entries with inline 'content' are uploaded to Qwen first and the
-    ///    returned file object is attached instead.
-    ///  - Entries with neither a non-empty 'url' nor 'content' are skipped
-    ///    (sent as no attachment) so placeholder/empty entries don't break Qwen.
+    /// Decrypts each encrypted fileId from the request, parses the resulting
+    /// JSON strings back into JsonObjects, and returns them as the files payload.
     /// </summary>
-    private static async Task<List<JsonObject>?> BuildFilesPayloadAsync(
-        SendPromptRequest body, string token, CancellationToken ct)
+    private List<JsonObject>? BuildFilesPayload(SendPromptRequest body)
     {
-        if (body.Files is null || body.Files.Count == 0) return null;
+        if (body.FileIds is null || body.FileIds.Count == 0) return null;
 
         var filesPayload = new List<JsonObject>();
-        foreach (var f in body.Files)
+
+        foreach (string encryptedId in body.FileIds)
         {
-            if (!string.IsNullOrWhiteSpace(f.Url))
+            if (string.IsNullOrWhiteSpace(encryptedId)) continue;
+
+            try
             {
-                filesPayload.Add(ToUpstreamDict(f));
+                string json = _encryptionService.Decrypt(encryptedId);
+                var fileObj = JsonNode.Parse(json)?.AsObject()
+                    ?? throw new InvalidOperationException("Decrypted fileId is not a JSON object.");
+                filesPayload.Add(fileObj);
             }
-            else if (f.Content is not null)
+            catch (FormatException e)
             {
-                try
-                {
-                    var fileObj = await QwenFileUpload.UploadFileContentAsync(
-                        f.Content, f.Filename ?? "attachment.txt", token, ct);
-                    filesPayload.Add(fileObj);
-                }
-                catch (Exception e)
-                {
-                    throw new HttpApiException(
-                        502, $"Auto-upload of inline file content failed: {e.Message}");
-                }
+                throw new HttpApiException(400, $"Invalid fileId encoding: {e.Message}");
             }
-            // else: empty placeholder entry -> skipped (no attachment)
+            catch (System.Security.Cryptography.CryptographicException e)
+            {
+                throw new HttpApiException(400, $"Failed to decrypt fileId: {e.Message}");
+            }
         }
 
         return filesPayload.Count > 0 ? filesPayload : null;
-    }
-
-    /// <summary>Serialize an attachment exactly like pydantic model_dump(extra="allow").</summary>
-    private static JsonObject ToUpstreamDict(FileAttachment f)
-    {
-        var obj = new JsonObject
-        {
-            // Normalize null/blank type (e.g. Swagger-generated samples) to "file".
-            ["type"] = string.IsNullOrWhiteSpace(f.Type) ? "file" : f.Type,
-            ["url"] = f.Url,
-            ["content"] = f.Content,
-            ["filename"] = f.Filename,
-        };
-        if (f.Extra is not null)
-        {
-            foreach (var kv in f.Extra)
-            {
-                obj[kv.Key] = kv.Value?.DeepClone();
-            }
-        }
-        return obj;
     }
 
     /// <summary>Reclassify 'action' events as 'tool' unless the tool is user_response/ask_user.</summary>
@@ -127,8 +100,8 @@ public sealed class ChatCompletionsController : ControllerBase
         // they are attached to the upstream request as cookies. Falls back to
         // the legacy single 'x5sec' field when the dictionary is not supplied.
 
-        // Resolve attachments: pass-through for real URLs, auto-upload for inline content.
-        var filesPayload = await BuildFilesPayloadAsync(body, token, ct);
+        // Resolve attachments: decrypt the encrypted fileId into the upstream file object.
+        var filesPayload = BuildFilesPayload(body);
 
         // Structured request/response logging for this exchange.
         var exchange = _exchangeLogger.Begin(body, filesPayload);
