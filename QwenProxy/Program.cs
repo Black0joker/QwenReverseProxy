@@ -23,8 +23,7 @@ builder.Services.AddSwaggerGen(c =>
 
     // Bearer security scheme (port of HTTPBearer in api/dependencies.py): Swagger
     // UI renders an "Authorize" input; the token is forwarded to Qwen as a
-    // `token` cookie. The definition alone renders the Auth input; a global
-    // security requirement entry is not needed for that.
+    // `token` cookie.
     c.AddSecurityDefinition("QwenToken", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -36,7 +35,14 @@ builder.Services.AddSwaggerGen(c =>
             "Paste your Qwen token. Swagger sends it as 'Authorization: Bearer <token>' " +
             "and the proxy forwards it to Qwen as a `token` cookie.",
     });
-});
+
+    // Global security requirement: without this, Swagger UI renders the
+    // Authorize button but does NOT attach the Authorization header to requests.
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("QwenToken", document)] = []
+    });
+    });
 
 // OpenAPI document for Scalar (Microsoft.OpenApi pipeline). Scalar's UI
 // fetches it via its built-in "openapi/{documentName}.json" source route.

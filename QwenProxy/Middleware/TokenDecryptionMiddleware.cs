@@ -89,7 +89,7 @@ public sealed class TokenDecryptionMiddleware
         }
         catch (JsonException)
         {
-            await WriteError(context, 401, "Decrypted token is not valid JSON or does not match TokenClass schema.");
+            await WriteError(context, 401, "Decrypted token is not valid JSON");
             return;
         }
 
