@@ -251,7 +251,15 @@ public sealed class QwenClient
         req.Content = form;
 
         var response = await SharedHttp.SendAsync(req, ct);
-        response.EnsureSuccessStatusCode();
+        try
+        {
+            response.EnsureSuccessStatusCode();
+        }
+        catch
+        {
+            response.Dispose();
+            throw;
+        }
         var result = await ReadJsonAsync(response, ct);
         Log.Success($"Chat uploaded: {result?.ToJsonString()}");
         return result;
@@ -416,6 +424,18 @@ public sealed class QwenClient
                 };
             }
             return new SendPromptResult { JsonPayload = data };
+        }
+
+        // Non-JSON error responses (e.g. HTML/text error pages): surface as an
+        // upstream failure instead of streaming raw content to the client.
+        if (!response.IsSuccessStatusCode)
+        {
+            int status = (int)response.StatusCode;
+            string body = await response.Content.ReadAsStringAsync(ct);
+            response.Dispose();
+            Log.Error($"send_prompt upstream error {status}: {body}");
+            throw new HttpRequestException(
+                $"Upstream returned {status} for chat completions: {body}");
         }
 
         return new SendPromptResult { StreamResponse = response };

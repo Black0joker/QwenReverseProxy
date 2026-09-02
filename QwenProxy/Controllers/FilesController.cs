@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using QwenProxy.Config;
 using QwenProxy.Middleware;
 using QwenProxy.Models;
@@ -8,6 +9,7 @@ namespace QwenProxy.Controllers;
 
 [ApiController]
 [Route("api/v1/files")]
+[EnableRateLimiting(RateLimitPolicies.Files)]
 public sealed class FilesController : ControllerBase
 {
     private readonly CookieStore _cookieStore;
@@ -53,10 +55,6 @@ public sealed class FilesController : ControllerBase
             await file.CopyToAsync(ms, ct);
             var fileObj = await client.UploadImageAsync(ms.ToArray(), filename, ct);
             return new JsonResult(fileObj);
-        }
-        catch (FileNotFoundException e)
-        {
-            throw new HttpApiException(404, e.Message);
         }
         catch (HttpRequestException e)
         {

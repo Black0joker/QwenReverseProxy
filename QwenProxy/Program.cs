@@ -1,4 +1,6 @@
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi;
 using QwenProxy.Config;
 using QwenProxy.Logging;
@@ -81,6 +83,52 @@ builder.Services.AddSingleton(_ => new QwenLogger(builder.Environment.ContentRoo
 builder.Services.AddSingleton(sp => new ChatExchangeLogger(
     sp.GetRequiredService<QwenLogger>(), builder.Environment.ContentRootPath));
 
+// Rate limiting: sliding windows keyed by the authenticated Qwen token
+// (fallback: client IP). Limits are configurable via appsettings "RateLimiting".
+var rateLimit = builder.Configuration.GetSection("RateLimiting").Get<RateLimitOptions>() ?? new RateLimitOptions();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, ct) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.ContentType = "application/json";
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            context.HttpContext.Response.Headers.RetryAfter =
+                ((int)Math.Ceiling(retryAfter.TotalSeconds)).ToString();
+        }
+        await context.HttpContext.Response.WriteAsJsonAsync(
+            new { detail = "Rate limit exceeded. Try again later." }, ct);
+    };
+
+    static SlidingWindowRateLimiterOptions Window(RateLimitOptions.WindowOptions w) => new()
+    {
+        PermitLimit = w.PermitLimit,
+        Window = TimeSpan.FromSeconds(w.WindowSeconds),
+        SegmentsPerWindow = 6,
+        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+        QueueLimit = 0,
+    };
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            RateLimitPartitioning.KeyFor(ctx), _ => Window(rateLimit.Global)));
+
+    options.AddPolicy(RateLimitPolicies.Completions, ctx =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            RateLimitPartitioning.KeyFor(ctx), _ => Window(rateLimit.Completions)));
+
+    options.AddPolicy(RateLimitPolicies.Chats, ctx =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            RateLimitPartitioning.KeyFor(ctx), _ => Window(rateLimit.Chats)));
+
+    options.AddPolicy(RateLimitPolicies.Files, ctx =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            RateLimitPartitioning.KeyFor(ctx), _ => Window(rateLimit.Files)));
+});
+
 var app = builder.Build();
 
 // Global exception handling: the proxy ALWAYS answers with a clean JSON payload.
@@ -88,6 +136,13 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 
 // AES token decryption: extracts Bearer token, decrypts, parses JSON -> TokenClass.
 app.UseTokenDecryption();
+
+// Rate limiting (placed after token decryption so requests can be keyed by
+// the decrypted token; falls back to client IP for anonymous requests).
+if (rateLimit.Enabled)
+{
+    app.UseRateLimiter();
+}
 
 // Swagger UI at /docs.
 app.UseSwagger();

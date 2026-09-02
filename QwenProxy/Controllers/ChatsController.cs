@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using QwenProxy.Config;
 using QwenProxy.Models;
 
@@ -6,6 +7,7 @@ namespace QwenProxy.Controllers;
 
 [ApiController]
 [Route("api/v1/chats")]
+[EnableRateLimiting(RateLimitPolicies.Chats)]
 public sealed class ChatsController : ControllerBase
 {
     private readonly CookieStore _cookieStore;

@@ -25,7 +25,8 @@ public sealed class TokenDecryptionMiddleware
     private readonly RequestDelegate _next;
     private readonly ITokenEncryptionService _encryptionService;
 
-    private const string ContextKey = "TokenClass";
+    /// <summary>HttpContext.Items key under which the decrypted TokenClass is stored.</summary>
+    public const string ContextKey = "TokenClass";
 
     public TokenDecryptionMiddleware(RequestDelegate next, ITokenEncryptionService encryptionService)
     {

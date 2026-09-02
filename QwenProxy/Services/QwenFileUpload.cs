@@ -208,7 +208,12 @@ public static class QwenFileUpload
     {
         string objectPath = stsData["file_path"]!.GetValue<string>();
         string pathFilename = objectPath.Split('/').Last();
-        string fileId = pathFilename.Replace($"_{filename}", "");
+        // Strip only the trailing "_{filename}" suffix (Replace would remove
+        // every occurrence, corrupting IDs when the filename repeats).
+        string fileIdSuffix = $"_{filename}";
+        string fileId = pathFilename.EndsWith(fileIdSuffix, StringComparison.Ordinal)
+            ? pathFilename[..^fileIdSuffix.Length]
+            : pathFilename;
 
         string itemId = Guid.NewGuid().ToString();
         string uploadTaskId = Guid.NewGuid().ToString()[..16];
