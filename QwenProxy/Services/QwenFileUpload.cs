@@ -20,7 +20,14 @@ public static class QwenFileUpload
         Timeout = TimeSpan.FromMinutes(5),
     };
 
-    private static readonly QwenLogger Log = new();
+    private static readonly Lazy<QwenLogger> FallbackLog = new(() => new QwenLogger());
+
+    /// <summary>
+    /// Routes through the DI-registered shared logger (same logs/agent.log as
+    /// controllers) when available; falls back to a local instance only before
+    /// the host finishes bootstrapping.
+    /// </summary>
+    private static QwenLogger Log => QwenLogger.Shared ?? FallbackLog.Value;
 
     private static readonly Dictionary<string, string> FileContentTypes = new()
     {

@@ -14,7 +14,14 @@ namespace QwenProxy.Sse;
 /// </summary>
 public static class SseStreamParser
 {
-    private static readonly QwenLogger Log = new();
+    private static readonly Lazy<QwenLogger> FallbackLog = new(() => new QwenLogger());
+
+    /// <summary>
+    /// Routes through the DI-registered shared logger (same logs/agent.log as
+    /// controllers) when available; falls back to a local instance only before
+    /// the host finishes bootstrapping.
+    /// </summary>
+    private static QwenLogger Log => QwenLogger.Shared ?? FallbackLog.Value;
 
     public static async IAsyncEnumerable<SseEvent> ParseAsync(
         Stream stream,

@@ -131,6 +131,12 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
+// Publish the DI logger as the process-wide shared instance so static helpers
+// (SseStreamParser, AnswerParser, QwenFileUpload) write to the same
+// logs/agent.log as controllers. The singleton is disposed (and its write
+// queue drained) automatically when the host shuts down.
+QwenLogger.Shared = app.Services.GetRequiredService<QwenLogger>();
+
 // Global exception handling: the proxy ALWAYS answers with a clean JSON payload.
 app.UseMiddleware<ErrorHandlingMiddleware>();
 

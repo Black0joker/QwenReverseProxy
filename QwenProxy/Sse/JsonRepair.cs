@@ -202,7 +202,17 @@ public static partial class JsonRepair
     [GeneratedRegex("\\n\\s*```\\s*$")]
     private static partial Regex CloseFenceRegex();
 
-    /// <summary>Repair a string containing an invalid JSON document.</summary>
+    /// <summary>
+    /// Repair a string containing an invalid JSON document.
+    /// <para>
+    /// <b>Behavioral note:</b> Unlike the upstream <c>jsonrepair</c> library (which throws a
+    /// <c>JsonRepairException</c> when unexpected content follows the first complete JSON value),
+    /// this implementation silently discards all trailing garbage after the first valid JSON
+    /// structure and returns only the repaired prefix. This is intentional: the proxy processes
+    /// SSE stream chunks that may contain partial or concatenated payloads, and strict trailing
+    /// content validation would reject otherwise-recoverable fragments mid-stream.
+    /// </para>
+    /// </summary>
     public static string Repair(string input)
     {
         var p = new Repairer(ExtractJsonFromMarkdown(input));
@@ -288,7 +298,15 @@ public static partial class JsonRepair
                 return _output;
             }
 
-            // Trailing content after valid JSON; skip it gracefully
+            // DEV NOTE: Upstream jsonrepair throws JsonRepairException here
+            // ("Unexpected character ... at position N") when non-whitespace
+            // content follows the first complete JSON value. We intentionally
+            // skip all trailing garbage instead of throwing. Rationale: SSE
+            // stream chunks may carry concatenated or partially-overlapping
+            // JSON payloads; tolerating trailing data lets the proxy recover
+            // the leading valid structure without aborting the stream.
+            // If strict validation is ever needed, use RepairAndValidate()
+            // or restore the upstream throw here.
             _i = _length;
             return _output;
         }
