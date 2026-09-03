@@ -1,7 +1,12 @@
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using QwenProxy.Config;
+using QwenProxy.Logging;
 using QwenProxy.Models;
+using QwenProxy.Services;
 
 namespace QwenProxy.Controllers;
 
@@ -11,8 +16,21 @@ namespace QwenProxy.Controllers;
 public sealed class ChatsController : ControllerBase
 {
     private readonly CookieStore _cookieStore;
+    private readonly string _contentRootPath;
+    private readonly QwenLogger _log;
 
-    public ChatsController(CookieStore cookieStore) => _cookieStore = cookieStore;
+    private static readonly JsonSerializerOptions PrettyJson = new()
+    {
+        WriteIndented = true,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    };
+
+    public ChatsController(CookieStore cookieStore, IWebHostEnvironment env, QwenLogger log)
+    {
+        _cookieStore = cookieStore;
+        _contentRootPath = env.ContentRootPath;
+        _log = log;
+    }
 
     /// <summary>Create a new chat.</summary>
     [HttpPost("new")]
@@ -85,5 +103,55 @@ public sealed class ChatsController : ControllerBase
         var client = TokenSupport.CreateClient(HttpContext, _cookieStore);
         var data = await client.UploadChatAsync(body.Data, ct);
         return new JsonResult(data);
+    }
+
+    /// <summary>Upload a chat from the internal cache format (auto-mapped to Qwen import format).</summary>
+    [HttpPost("upload-cache")]
+    public async Task<IActionResult> UploadCacheChat([FromBody] UploadCacheChatRequest body, CancellationToken ct)
+    {
+        _log.Info($"[DIAG] upload-cache invoked: chat_id={body.ChatId}, messages={body.Messages.Count}");
+
+        // Build the cache JsonObject from the request body fields
+        var cache = new JsonObject
+        {
+            ["chat_id"] = body.ChatId,
+            ["messages"] = body.Messages.DeepClone(),
+        };
+
+        var messagesFormat = ChatCacheMapper.MapToMessagesFormat(cache);
+        _log.Info($"[DIAG] Mapping complete for chat_id={body.ChatId}");
+
+        // Persist the mapped chat locally for diagnostics (before upload so it
+        // is always available even if the upstream call fails).
+        SaveMappedChat(body.ChatId, messagesFormat);
+
+        var client = TokenSupport.CreateClient(HttpContext, _cookieStore);
+        var data = await client.UploadChatAsync(messagesFormat, ct);
+        return new JsonResult(data);
+    }
+
+    /// <summary>
+    /// Writes the mapped chat JSON to the local chats/ folder for diagnostics.
+    /// Failures are logged but never block the upload.
+    /// </summary>
+    private void SaveMappedChat(string chatId, JsonObject mapped)
+    {
+        try
+        {
+            string dir = Path.Combine(_contentRootPath, "chats");
+            Directory.CreateDirectory(dir);
+
+            string filename = $"{chatId}.json";
+            string path = Path.Combine(dir, filename);
+
+            string json = mapped.ToJsonString(PrettyJson);
+            System.IO.File.WriteAllText(path, json, new UTF8Encoding(false));
+
+            _log.Info($"[DIAG] Mapped chat saved: {path}");
+        }
+        catch (Exception e)
+        {
+            _log.Error($"[DIAG] Failed to save mapped chat '{chatId}': {e.Message}");
+        }
     }
 }

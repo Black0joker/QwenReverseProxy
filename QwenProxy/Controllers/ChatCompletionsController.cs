@@ -195,6 +195,8 @@ public sealed class ChatCompletionsController : ControllerBase
                         _exchangeLogger.CaptureFinal(exchange, ev.Value);
                     else if (ev.Type == "error" && ev.Value is not null)
                         _exchangeLogger.CaptureErrorEvent(exchange, ev.Value);
+                    else if (ev.Type == "tokens" && ev.Value is not null)
+                        _exchangeLogger.CaptureUsage(exchange, ev.Value);
 
                     if (ev.Type == "stream_text")
                     {

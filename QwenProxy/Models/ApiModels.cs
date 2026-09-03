@@ -127,6 +127,18 @@ public sealed class ImportChatRequest
     public JsonObject Data { get; set; } = new();
 }
 
+/// <summary>Request body for uploading a chat from the internal cache format.</summary>
+public sealed class UploadCacheChatRequest
+{
+    [JsonPropertyName("chat_id")]
+    [Required]
+    public string ChatId { get; set; } = "";
+
+    [JsonPropertyName("messages")]
+    [Required]
+    public JsonArray Messages { get; set; } = new();
+}
+
 // ---------------------------------------------------------------------------
 // Files
 // ---------------------------------------------------------------------------

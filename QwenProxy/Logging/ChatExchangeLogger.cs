@@ -46,6 +46,7 @@ public sealed class ChatExchangeLogger
         public JsonObject EventCounts { get; } = new();
         public JsonNode? Final { get; set; }
         public JsonNode? ErrorEvent { get; set; }
+        public JsonNode? Usage { get; set; }
         public string? Error { get; set; }
         public string Outcome { get; set; } = "unknown";
         public int TotalEvents { get; set; }
@@ -125,6 +126,10 @@ public sealed class ChatExchangeLogger
     public void CaptureErrorEvent(ExchangeHandle handle, JsonNode error) =>
         handle.ErrorEvent = error.DeepClone();
 
+    /// <summary>Capture usage/token data emitted by the upstream stream.</summary>
+    public void CaptureUsage(ExchangeHandle handle, JsonNode usage) =>
+        handle.Usage = usage.DeepClone();
+
     /// <summary>Record a failure (exception message) and write the log immediately.</summary>
     public void Fail(ExchangeHandle handle, string outcome, string error)
     {
@@ -169,6 +174,7 @@ public sealed class ChatExchangeLogger
         };
         if (handle.Final is not null) response["final"] = handle.Final;
         if (handle.ErrorEvent is not null) response["error_event"] = handle.ErrorEvent;
+        if (handle.Usage is not null) response["usage"] = handle.Usage;
         if (handle.Error is not null) response["error"] = handle.Error;
 
         var record = new JsonObject

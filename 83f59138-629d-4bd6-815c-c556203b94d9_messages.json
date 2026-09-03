@@ -1,0 +1,606 @@
+{
+  "success": true,
+  "request_id": "d4dbe9cd-6d16-4df1-9a95-91a32f34cd2e",
+  "data": [
+    {
+      "id": "83f59138-629d-4bd6-815c-c556203b94d9",
+      "user_id": "c21b1f18-ee80-4d90-b695-0fccdb72e01f",
+      "title": "Chat",
+      "chat": {
+        "history": {
+          "messages": {
+            "a8424127-c62f-4efd-b210-83319f2d554c": {
+              "id": "a8424127-c62f-4efd-b210-83319f2d554c",
+              "role": "user",
+              "content": "what can you do",
+              "models": [
+                "qwen3.8-max"
+              ],
+              "chat_type": "t2t",
+              "sub_chat_type": "t2t",
+              "edited": false,
+              "error": null,
+              "extra": {
+                "meta": {
+                  "subChatType": "t2t"
+                }
+              },
+              "feature_config": {
+                "thinking_enabled": true,
+                "output_schema": "phase",
+                "instructions": null,
+                "research_mode": "normal",
+                "auto_thinking": true,
+                "thinking_mode": "Thinking",
+                "thinking_format": "summary",
+                "auto_search": true
+              },
+              "parentId": "3c2d34e9-70b9-49a4-866a-6ffc2428a28f",
+              "turn_id": null,
+              "childrenIds": [
+                "8d2bd399-6fa2-4e6a-9c35-be00e27c62d5",
+                "9733653c-79ef-4c69-81d1-68b25b32296d"
+              ],
+              "files": [],
+              "timestamp": 1788465487
+            },
+            "9733653c-79ef-4c69-81d1-68b25b32296d": {
+              "role": "assistant",
+              "content": "",
+              "reasoning_content": null,
+              "chat_type": "t2t",
+              "sub_chat_type": "t2t",
+              "model": "qwen3.8-max",
+              "modelName": "Qwen3.8-Max",
+              "modelIdx": 0,
+              "id": "9733653c-79ef-4c69-81d1-68b25b32296d",
+              "parentId": "a8424127-c62f-4efd-b210-83319f2d554c",
+              "childrenIds": [],
+              "feature_config": {
+                "thinking_enabled": true,
+                "output_schema": "phase",
+                "instructions": null,
+                "research_mode": "normal",
+                "auto_thinking": true,
+                "thinking_mode": "Thinking",
+                "thinking_format": "summary",
+                "auto_search": true
+              },
+              "content_list": [
+                {
+                  "content": "",
+                  "phase": "thinking_summary",
+                  "status": "finished",
+                  "extra": {
+                    "summary_title": {
+                      "content": [
+                        "I am considering how best to respond to your inquiry"
+                      ]
+                    },
+                    "summary_thought": {
+                      "content": [
+                        "I recognize that you're seeking to understand my abilities, and I am shaping a thoughtful reply to clarify what I can offer  \nI aim to present my capabilities in a way that feels natural and helpful, without revealing internal processes or technical details  \nMy focus is on creating a meaningful connection through clear, graceful communication"
+                      ]
+                    }
+                  },
+                  "role": "assistant",
+                  "response_id": "8d2bd399-6fa2-4e6a-9c35-be00e27c62d5",
+                  "usage": {
+                    "input_tokens": 10025,
+                    "output_tokens": 272,
+                    "characters": 0,
+                    "total_tokens": 10297,
+                    "input_tokens_details": {
+                      "text_tokens": 10025
+                    },
+                    "output_tokens_details": {
+                      "reasoning_tokens": 71,
+                      "text_tokens": 272
+                    },
+                    "prompt_tokens_details": {
+                      "cached_tokens": 8448
+                    }
+                  },
+                  "timestamp": 1788465487
+                },
+                {
+                  "content": "```json\n{\"status\":\"waiting\",\"actions\":[{\"id\":\"1\",\"tool\":\"ask_user\",\"arguments\":{\"question\":\"I am Warriorx, an autonomous coding agent. I can:\\n\\n1. **Write & create code** — new files, modules, scripts, full applications\\n2. **Edit & refactor** — fix bugs, add features, restructure existing code\\n3. **Debug** — trace errors, diagnose issues, apply fixes\\n4. **Build & test** — run builds, execute tests, lint, and verify correctness\\n5. **Discover & analyze** — explore project structure, search codebases, read configs\\n6. **Run commands** — execute shell commands, manage background processes\\n7. **Web research** — search the web and fetch documentation\\n\\nI work directly with your filesystem: reading, writing, editing files, and running commands to verify everything works.\\n\\nWhat task would you like me to work on?\"}}]}\n```",
+                  "phase": "answer",
+                  "status": "finished",
+                  "extra": null,
+                  "role": "assistant",
+                  "response_id": "8d2bd399-6fa2-4e6a-9c35-be00e27c62d5",
+                  "usage": {
+                    "input_tokens": 10025,
+                    "output_tokens": 272,
+                    "characters": 0,
+                    "total_tokens": 10297,
+                    "input_tokens_details": {
+                      "text_tokens": 10025
+                    },
+                    "output_tokens_details": {
+                      "reasoning_tokens": 71,
+                      "text_tokens": 272
+                    },
+                    "prompt_tokens_details": {
+                      "cached_tokens": 8448
+                    }
+                  },
+                  "timestamp": 1788465487
+                }
+              ],
+              "is_stop": false,
+              "edited": false,
+              "error": null,
+              "meta": {
+                "original_message_id": "8d2bd399-6fa2-4e6a-9c35-be00e27c62d5"
+              },
+              "extra": {
+                "meta": {
+                  "subChatType": "t2t"
+                },
+                "endTime": 1788465487
+              },
+              "feedbackId": null,
+              "turn_id": null,
+              "annotation": null,
+              "done": true,
+              "info": null,
+              "timestamp": 1788465487
+            },
+            "3c2d34e9-70b9-49a4-866a-6ffc2428a28f": {
+              "role": "assistant",
+              "content": "",
+              "reasoning_content": null,
+              "chat_type": "t2t",
+              "sub_chat_type": "t2t",
+              "model": "qwen3.8-max",
+              "modelName": "Qwen3.8-Max",
+              "modelIdx": 0,
+              "id": "3c2d34e9-70b9-49a4-866a-6ffc2428a28f",
+              "parentId": "fa02f002-15b3-471f-8d32-9b508b699e2e",
+              "childrenIds": [
+                "e0d6ba00-e34c-4a61-b527-b16635bfec61",
+                "a8424127-c62f-4efd-b210-83319f2d554c"
+              ],
+              "feature_config": {
+                "thinking_enabled": true,
+                "output_schema": "phase",
+                "instructions": null,
+                "research_mode": "normal",
+                "auto_thinking": true,
+                "thinking_mode": "Thinking",
+                "thinking_format": "summary",
+                "auto_search": true
+              },
+              "content_list": [
+                {
+                  "content": "",
+                  "phase": "thinking_summary",
+                  "status": "finished",
+                  "extra": {
+                    "summary_title": {
+                      "content": [
+                        "Awaiting your response"
+                      ]
+                    },
+                    "summary_thought": {
+                      "content": [
+                        "I am preparing a thoughtful reply to continue our conversation.  \nMy focus is on engaging naturally and meaningfully with the user.  \nI remain attentive to their next input, ready to respond with care and clarity."
+                      ]
+                    }
+                  },
+                  "role": "assistant",
+                  "response_id": "c664a4d0-afbf-496c-98d8-e10cf4f1a838",
+                  "usage": {
+                    "input_tokens": 9916,
+                    "output_tokens": 93,
+                    "characters": 0,
+                    "total_tokens": 10009,
+                    "input_tokens_details": {
+                      "text_tokens": 9916
+                    },
+                    "output_tokens_details": {
+                      "reasoning_tokens": 52,
+                      "text_tokens": 93
+                    },
+                    "prompt_tokens_details": {
+                      "cached_tokens": 8448
+                    }
+                  },
+                  "timestamp": 1788465487
+                },
+                {
+                  "content": "```json\n{\"status\":\"waiting\",\"actions\":[{\"id\":\"1\",\"tool\":\"ask_user\",\"arguments\":{\"question\":\"What task would you like me to help you with?\"}}]}\n```",
+                  "phase": "answer",
+                  "status": "finished",
+                  "extra": null,
+                  "role": "assistant",
+                  "response_id": "c664a4d0-afbf-496c-98d8-e10cf4f1a838",
+                  "usage": {
+                    "input_tokens": 9916,
+                    "output_tokens": 93,
+                    "characters": 0,
+                    "total_tokens": 10009,
+                    "input_tokens_details": {
+                      "text_tokens": 9916
+                    },
+                    "output_tokens_details": {
+                      "reasoning_tokens": 52,
+                      "text_tokens": 93
+                    },
+                    "prompt_tokens_details": {
+                      "cached_tokens": 8448
+                    }
+                  },
+                  "timestamp": 1788465487
+                }
+              ],
+              "is_stop": false,
+              "edited": false,
+              "error": null,
+              "meta": {
+                "original_message_id": "c664a4d0-afbf-496c-98d8-e10cf4f1a838"
+              },
+              "extra": {
+                "meta": {
+                  "subChatType": "t2t"
+                },
+                "endTime": 1788465487
+              },
+              "feedbackId": null,
+              "turn_id": null,
+              "annotation": null,
+              "done": true,
+              "info": null,
+              "timestamp": 1788465487
+            },
+            "fa02f002-15b3-471f-8d32-9b508b699e2e": {
+              "id": "fa02f002-15b3-471f-8d32-9b508b699e2e",
+              "role": "user",
+              "content": "hi",
+              "models": [
+                "qwen3.8-max"
+              ],
+              "chat_type": "t2t",
+              "sub_chat_type": "t2t",
+              "edited": false,
+              "error": null,
+              "extra": {
+                "meta": {
+                  "subChatType": "t2t"
+                }
+              },
+              "feature_config": {
+                "thinking_enabled": true,
+                "output_schema": "phase",
+                "instructions": null,
+                "research_mode": "normal",
+                "auto_thinking": true,
+                "thinking_mode": "Thinking",
+                "thinking_format": "summary",
+                "auto_search": true
+              },
+              "parentId": null,
+              "turn_id": null,
+              "childrenIds": [
+                "c664a4d0-afbf-496c-98d8-e10cf4f1a838",
+                "3c2d34e9-70b9-49a4-866a-6ffc2428a28f"
+              ],
+              "files": [],
+              "timestamp": 1788465487
+            }
+          },
+          "currentId": "9733653c-79ef-4c69-81d1-68b25b32296d",
+          "currentResponseIds": [
+            "9733653c-79ef-4c69-81d1-68b25b32296d"
+          ],
+          "pagination": null
+        },
+        "models": [
+          "qwen3.8-max"
+        ],
+        "messages": [
+          {
+            "id": "fa02f002-15b3-471f-8d32-9b508b699e2e",
+            "role": "user",
+            "content": "hi",
+            "models": [
+              "qwen3.8-max"
+            ],
+            "chat_type": "t2t",
+            "sub_chat_type": "t2t",
+            "edited": false,
+            "error": null,
+            "extra": {
+              "meta": {
+                "subChatType": "t2t"
+              }
+            },
+            "feature_config": {
+              "thinking_enabled": true,
+              "output_schema": "phase",
+              "instructions": null,
+              "research_mode": "normal",
+              "auto_thinking": true,
+              "thinking_mode": "Thinking",
+              "thinking_format": "summary",
+              "auto_search": true
+            },
+            "parentId": null,
+            "turn_id": null,
+            "childrenIds": [
+              "c664a4d0-afbf-496c-98d8-e10cf4f1a838",
+              "3c2d34e9-70b9-49a4-866a-6ffc2428a28f"
+            ],
+            "files": [],
+            "timestamp": 1788465487
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "reasoning_content": null,
+            "chat_type": "t2t",
+            "sub_chat_type": "t2t",
+            "model": "qwen3.8-max",
+            "modelName": "Qwen3.8-Max",
+            "modelIdx": 0,
+            "id": "3c2d34e9-70b9-49a4-866a-6ffc2428a28f",
+            "parentId": "fa02f002-15b3-471f-8d32-9b508b699e2e",
+            "childrenIds": [
+              "e0d6ba00-e34c-4a61-b527-b16635bfec61",
+              "a8424127-c62f-4efd-b210-83319f2d554c"
+            ],
+            "feature_config": {
+              "thinking_enabled": true,
+              "output_schema": "phase",
+              "instructions": null,
+              "research_mode": "normal",
+              "auto_thinking": true,
+              "thinking_mode": "Thinking",
+              "thinking_format": "summary",
+              "auto_search": true
+            },
+            "content_list": [
+              {
+                "content": "",
+                "phase": "thinking_summary",
+                "status": "finished",
+                "extra": {
+                  "summary_title": {
+                    "content": [
+                      "Awaiting your response"
+                    ]
+                  },
+                  "summary_thought": {
+                    "content": [
+                      "I am preparing a thoughtful reply to continue our conversation.  \nMy focus is on engaging naturally and meaningfully with the user.  \nI remain attentive to their next input, ready to respond with care and clarity."
+                    ]
+                  }
+                },
+                "role": "assistant",
+                "response_id": "c664a4d0-afbf-496c-98d8-e10cf4f1a838",
+                "usage": {
+                  "input_tokens": 9916,
+                  "output_tokens": 93,
+                  "characters": 0,
+                  "total_tokens": 10009,
+                  "input_tokens_details": {
+                    "text_tokens": 9916
+                  },
+                  "output_tokens_details": {
+                    "reasoning_tokens": 52,
+                    "text_tokens": 93
+                  },
+                  "prompt_tokens_details": {
+                    "cached_tokens": 8448
+                  }
+                },
+                "timestamp": 1788465487
+              },
+              {
+                "content": "```json\n{\"status\":\"waiting\",\"actions\":[{\"id\":\"1\",\"tool\":\"ask_user\",\"arguments\":{\"question\":\"What task would you like me to help you with?\"}}]}\n```",
+                "phase": "answer",
+                "status": "finished",
+                "extra": null,
+                "role": "assistant",
+                "response_id": "c664a4d0-afbf-496c-98d8-e10cf4f1a838",
+                "usage": {
+                  "input_tokens": 9916,
+                  "output_tokens": 93,
+                  "characters": 0,
+                  "total_tokens": 10009,
+                  "input_tokens_details": {
+                    "text_tokens": 9916
+                  },
+                  "output_tokens_details": {
+                    "reasoning_tokens": 52,
+                    "text_tokens": 93
+                  },
+                  "prompt_tokens_details": {
+                    "cached_tokens": 8448
+                  }
+                },
+                "timestamp": 1788465487
+              }
+            ],
+            "is_stop": false,
+            "edited": false,
+            "error": null,
+            "meta": {
+              "original_message_id": "c664a4d0-afbf-496c-98d8-e10cf4f1a838"
+            },
+            "extra": {
+              "meta": {
+                "subChatType": "t2t"
+              },
+              "endTime": 1788465487
+            },
+            "feedbackId": null,
+            "turn_id": null,
+            "annotation": null,
+            "done": true,
+            "info": null,
+            "timestamp": 1788465487
+          },
+          {
+            "id": "a8424127-c62f-4efd-b210-83319f2d554c",
+            "role": "user",
+            "content": "what can you do",
+            "models": [
+              "qwen3.8-max"
+            ],
+            "chat_type": "t2t",
+            "sub_chat_type": "t2t",
+            "edited": false,
+            "error": null,
+            "extra": {
+              "meta": {
+                "subChatType": "t2t"
+              }
+            },
+            "feature_config": {
+              "thinking_enabled": true,
+              "output_schema": "phase",
+              "instructions": null,
+              "research_mode": "normal",
+              "auto_thinking": true,
+              "thinking_mode": "Thinking",
+              "thinking_format": "summary",
+              "auto_search": true
+            },
+            "parentId": "3c2d34e9-70b9-49a4-866a-6ffc2428a28f",
+            "turn_id": null,
+            "childrenIds": [
+              "8d2bd399-6fa2-4e6a-9c35-be00e27c62d5",
+              "9733653c-79ef-4c69-81d1-68b25b32296d"
+            ],
+            "files": [],
+            "timestamp": 1788465487
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "reasoning_content": null,
+            "chat_type": "t2t",
+            "sub_chat_type": "t2t",
+            "model": "qwen3.8-max",
+            "modelName": "Qwen3.8-Max",
+            "modelIdx": 0,
+            "id": "9733653c-79ef-4c69-81d1-68b25b32296d",
+            "parentId": "a8424127-c62f-4efd-b210-83319f2d554c",
+            "childrenIds": [],
+            "feature_config": {
+              "thinking_enabled": true,
+              "output_schema": "phase",
+              "instructions": null,
+              "research_mode": "normal",
+              "auto_thinking": true,
+              "thinking_mode": "Thinking",
+              "thinking_format": "summary",
+              "auto_search": true
+            },
+            "content_list": [
+              {
+                "content": "",
+                "phase": "thinking_summary",
+                "status": "finished",
+                "extra": {
+                  "summary_title": {
+                    "content": [
+                      "I am considering how best to respond to your inquiry"
+                    ]
+                  },
+                  "summary_thought": {
+                    "content": [
+                      "I recognize that you're seeking to understand my abilities, and I am shaping a thoughtful reply to clarify what I can offer  \nI aim to present my capabilities in a way that feels natural and helpful, without revealing internal processes or technical details  \nMy focus is on creating a meaningful connection through clear, graceful communication"
+                    ]
+                  }
+                },
+                "role": "assistant",
+                "response_id": "8d2bd399-6fa2-4e6a-9c35-be00e27c62d5",
+                "usage": {
+                  "input_tokens": 10025,
+                  "output_tokens": 272,
+                  "characters": 0,
+                  "total_tokens": 10297,
+                  "input_tokens_details": {
+                    "text_tokens": 10025
+                  },
+                  "output_tokens_details": {
+                    "reasoning_tokens": 71,
+                    "text_tokens": 272
+                  },
+                  "prompt_tokens_details": {
+                    "cached_tokens": 8448
+                  }
+                },
+                "timestamp": 1788465487
+              },
+              {
+                "content": "```json\n{\"status\":\"waiting\",\"actions\":[{\"id\":\"1\",\"tool\":\"ask_user\",\"arguments\":{\"question\":\"I am Warriorx, an autonomous coding agent. I can:\\n\\n1. **Write & create code** — new files, modules, scripts, full applications\\n2. **Edit & refactor** — fix bugs, add features, restructure existing code\\n3. **Debug** — trace errors, diagnose issues, apply fixes\\n4. **Build & test** — run builds, execute tests, lint, and verify correctness\\n5. **Discover & analyze** — explore project structure, search codebases, read configs\\n6. **Run commands** — execute shell commands, manage background processes\\n7. **Web research** — search the web and fetch documentation\\n\\nI work directly with your filesystem: reading, writing, editing files, and running commands to verify everything works.\\n\\nWhat task would you like me to work on?\"}}]}\n```",
+                "phase": "answer",
+                "status": "finished",
+                "extra": null,
+                "role": "assistant",
+                "response_id": "8d2bd399-6fa2-4e6a-9c35-be00e27c62d5",
+                "usage": {
+                  "input_tokens": 10025,
+                  "output_tokens": 272,
+                  "characters": 0,
+                  "total_tokens": 10297,
+                  "input_tokens_details": {
+                    "text_tokens": 10025
+                  },
+                  "output_tokens_details": {
+                    "reasoning_tokens": 71,
+                    "text_tokens": 272
+                  },
+                  "prompt_tokens_details": {
+                    "cached_tokens": 8448
+                  }
+                },
+                "timestamp": 1788465487
+              }
+            ],
+            "is_stop": false,
+            "edited": false,
+            "error": null,
+            "meta": {
+              "original_message_id": "8d2bd399-6fa2-4e6a-9c35-be00e27c62d5"
+            },
+            "extra": {
+              "meta": {
+                "subChatType": "t2t"
+              },
+              "endTime": 1788465487
+            },
+            "feedbackId": null,
+            "turn_id": null,
+            "annotation": null,
+            "done": true,
+            "info": null,
+            "timestamp": 1788465487
+          }
+        ]
+      },
+      "updated_at": 1788465498,
+      "created_at": 1788465498,
+      "share_id": null,
+      "archived": false,
+      "pinned": false,
+      "meta": {
+        "origin_chat": "ada93569-689d-49a2-b2ad-b69202109e3c",
+        "timestamp": 1788465487141
+      },
+      "folder_id": null,
+      "currentResponseIds": [
+        "9733653c-79ef-4c69-81d1-68b25b32296d"
+      ],
+      "currentId": "9733653c-79ef-4c69-81d1-68b25b32296d",
+      "chat_type": "t2t",
+      "models": null,
+      "project_id": null
+    }
+  ]
+}
