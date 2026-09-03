@@ -30,6 +30,7 @@ public static class SseStreamParser
     {
         bool responseIdSent = false;
         string? lastSummaryTitle = null;
+        string? lastSummaryThought = null;
 
         string? responseId = null;
         bool errorScanned = false;
@@ -141,10 +142,12 @@ public static class SseStreamParser
 
                 if (!responseIdSent)
                 {
+                    string? parentId = null;
                     if (ev["response.created"] is JsonObject respCreated)
                     {
                         responseId = GetString(respCreated, "response_id");
                         chatId = GetString(respCreated, "chat_id");
+                        parentId = GetString(respCreated, "parent_id");
                     }
 
                     if (!string.IsNullOrEmpty(responseId) && !string.IsNullOrEmpty(chatId))
@@ -153,6 +156,8 @@ public static class SseStreamParser
                         logBuffer.SetTarget(chatId!, responseId!);
                         logBuffer.Write(line);
                         yield return SseEvent.OfValue("response_id", JsonValue.Create(responseId));
+                        if (!string.IsNullOrEmpty(parentId))
+                            yield return SseEvent.OfValue("parent_message_id", JsonValue.Create(parentId));
                     }
                 }
 
@@ -161,20 +166,7 @@ public static class SseStreamParser
 
                 if (ev["usage"] is JsonObject usage && usage["total_tokens"] is not null)
                 {
-                    long? total = null;
-                    try
-                    {
-                        total = usage["total_tokens"]!.GetValue<long>();
-                    }
-                    catch (Exception)
-                    {
-                        // non-numeric total_tokens: ignore (defensive)
-                    }
-
-                    if (total.HasValue)
-                    {
-                        yield return SseEvent.OfValue("tokens", JsonValue.Create(total.Value));
-                    }
+                    yield return SseEvent.OfValue("tokens", usage.DeepClone());
                 }
 
                 var choices = ev["choices"] as JsonArray;
@@ -234,6 +226,17 @@ public static class SseStreamParser
                                 {
                                     lastSummaryTitle = title;
                                     yield return SseEvent.OfValue("summary_title", JsonValue.Create(title));
+                                }
+                            }
+
+                            var thoughts = (delta?["extra"] as JsonObject)?["summary_thought"]?["content"] as JsonArray;
+                            if (thoughts is { Count: > 0 })
+                            {
+                                string? thought = thoughts[^1]?.GetValue<string>();
+                                if (thought != lastSummaryThought)
+                                {
+                                    lastSummaryThought = thought;
+                                    yield return SseEvent.OfValue("summary_thought", JsonValue.Create(thought));
                                 }
                             }
                         }
