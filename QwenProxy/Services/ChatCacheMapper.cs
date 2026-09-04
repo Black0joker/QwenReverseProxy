@@ -22,6 +22,9 @@ public static class ChatCacheMapper
         string chatId = cache["chat_id"]?.GetValue<string>()
             ?? throw new InvalidOperationException("cache is missing 'chat_id'");
 
+        var Title = cache["title"]?.GetValue<string>()
+            ?? throw new InvalidOperationException("cache is missing 'Title' ");
+
         var cacheMessages = cache["messages"] as JsonArray
             ?? throw new InvalidOperationException("cache is missing 'messages' array");
 
@@ -106,7 +109,7 @@ public static class ChatCacheMapper
         {
             ["id"] = chatId,
             ["user_id"] = "",
-            ["title"] = "Chat",
+            ["title"] = Title,
             ["chat"] = chatObj,
             ["updated_at"] = baseTimestamp,
             ["created_at"] = baseTimestamp,

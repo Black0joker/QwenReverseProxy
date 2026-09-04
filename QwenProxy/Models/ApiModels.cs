@@ -134,6 +134,9 @@ public sealed class UploadCacheChatRequest
     [Required]
     public string ChatId { get; set; } = "";
 
+    [JsonPropertyName("title")]
+    public string? Title { get; set; } = "";
+
     [JsonPropertyName("messages")]
     [Required]
     public JsonArray Messages { get; set; } = new();

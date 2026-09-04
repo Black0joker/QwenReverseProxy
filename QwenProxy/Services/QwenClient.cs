@@ -134,7 +134,6 @@ public sealed class QwenClient
         long timestampMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var payload = new JsonObject
         {
-            ["title"] = "New Chat",
             ["models"] = new JsonArray(Model),
             ["chat_mode"] = "normal",
             ["chat_type"] = "t2t",
@@ -203,6 +202,17 @@ public sealed class QwenClient
         var data = await ReadJsonAsync(response, ct);
         Log.Success($"Fetched history for session: {chatSessionId}");
         return data;
+    }
+
+    public async Task<string?> GetChatTitleAsync(string chatSessionId, CancellationToken ct = default)
+    {
+        Log.Info($"Fetching chat title for session: {chatSessionId}");
+        using var response = await RequestAsync(
+            HttpMethod.Get, $"https://chat.qwen.ai/api/v2/chats/{chatSessionId}", ct: ct);
+        var data = await ReadJsonAsync(response, ct);
+        Log.Success($"Fetched title for session: {chatSessionId}");
+        var node = data?["data"]?["title"];
+        return node?.GetValue<string>();
     }
 
     /// <summary>Gets the chat history with the 'data' payload wrapped in a list.</summary>
