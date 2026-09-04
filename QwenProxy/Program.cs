@@ -150,34 +150,38 @@ if (rateLimit.Enabled)
     app.UseRateLimiter();
 }
 
-// Swagger UI at /docs.
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+if(app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Qwen Proxy API");
-    c.RoutePrefix = "docs";
-    c.DocumentTitle = "Qwen Proxy API";
-});
+    // Swagger UI at /docs.
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Qwen Proxy API");
+        c.RoutePrefix = "docs";
+        c.DocumentTitle = "Qwen Proxy API";
+    });
 
-// Scalar API reference. The UI itself lives at /scalar/v1 (one page per
-// OpenAPI document); /scalar is a convenience redirect so both work.
-app.MapOpenApi(); // serves /openapi/v1.json (Microsoft pipeline, used by Scalar)
-app.MapScalarApiReference(options =>
-{
-    options
-        .WithTitle("Qwen Proxy API")
-        .AddDocument("v1", "Qwen Proxy API")
-        .AddPreferredSecuritySchemes("QwenToken");
-});
-app.MapGet("/scalar", () => Results.Redirect("/scalar/v1"));
+    // Scalar API reference. The UI itself lives at /scalar/v1 (one page per
+    // OpenAPI document); /scalar is a convenience redirect so both work.
+    app.MapOpenApi(); // serves /openapi/v1.json (Microsoft pipeline, used by Scalar)
+    app.MapScalarApiReference(options =>
+    {
+        options
+            .WithTitle("Qwen Proxy API")
+            .AddDocument("v1", "Qwen Proxy API")
+            .AddPreferredSecuritySchemes("QwenToken");
+    });
+    app.MapGet("/scalar", () => Results.Redirect("/scalar/v1"));
 
-app.MapGet("/", () => new
-{
-    service = "Qwen Proxy API",
-    docs = "/docs",
-    scalar = "/scalar",
-    openapi = "/swagger/v1/swagger.json",
-});
+    app.MapGet("/", () => new
+    {
+        service = "Qwen Proxy API",
+        docs = "/docs",
+        scalar = "/scalar",
+        openapi = "/swagger/v1/swagger.json",
+    });
+
+}
 
 app.MapControllers();
 

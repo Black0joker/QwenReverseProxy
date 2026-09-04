@@ -42,14 +42,6 @@ public sealed class ChatsController : ControllerBase
         return new CreateChatResponse { ChatId = chatId };
     }
 
-    /// <summary>List chat sessions.</summary>
-    [HttpGet]
-    public async Task<ActionResult<ChatListResponse>> FetchChats(CancellationToken ct)
-    {
-        var client = TokenSupport.CreateClient(HttpContext, _cookieStore);
-        var chats = await client.FetchChatsAsync(ct);
-        return new ChatListResponse { Chats = chats };
-    }
 
     /// <summary>Check if a chat exists by its ID.</summary>
     [HttpGet("{chatId}/exists")]
