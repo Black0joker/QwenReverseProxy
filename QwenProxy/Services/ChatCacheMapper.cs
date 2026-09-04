@@ -58,6 +58,10 @@ public static class ChatCacheMapper
         var messagesArray = new JsonArray();
         long baseTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
+        // Resolved upstream Qwen model for the chat, derived from each message's
+        // darktech alias (model_name). Defaults to darktech_v3 -> qwen3.8-max.
+        string chatModel = ModelMapper.Resolve("darktech_v3");
+
         foreach (var msgNode in cacheMessages)
         {
             if (msgNode is not JsonObject msg) continue;
@@ -66,7 +70,8 @@ public static class ChatCacheMapper
 
             string role = msg["role"]?.GetValue<string>() ?? "user";
             string? parentId = msg["parent_message_id"]?.GetValue<string>();
-            string modelName = msg["model_name"]?.GetValue<string>() ?? "qwen3.8-max";
+            string modelName = ModelMapper.Resolve(msg["model_name"]?.GetValue<string>() ?? "darktech_v3");
+            chatModel = modelName;
             bool thinkingMode = msg["thinking_mode"]?.GetValue<bool>() ?? false;
 
             var children = childrenMap.TryGetValue(msgId, out var childList)
@@ -76,11 +81,11 @@ public static class ChatCacheMapper
             JsonObject mapped;
             if (role == "user")
             {
-                mapped = BuildUserMessage(msg, msgId, parentId, modelName, thinkingMode, children, baseTimestamp);
+                mapped = BuildUserMessage(msg, msgId, parentId, chatModel, thinkingMode, children, baseTimestamp);
             }
             else
             {
-                mapped = BuildAssistantMessage(msg, msgId, parentId, modelName, thinkingMode, children, baseTimestamp);
+                mapped = BuildAssistantMessage(msg, msgId, parentId, chatModel, thinkingMode, children, baseTimestamp);
             }
 
             messagesDict[msgId] = mapped;
@@ -99,7 +104,7 @@ public static class ChatCacheMapper
         var chatObj = new JsonObject
         {
             ["history"] = history,
-            ["models"] = new JsonArray("qwen3.8-max"),
+            ["models"] = new JsonArray(chatModel),
             ["messages"] = messagesArray,
         };
 

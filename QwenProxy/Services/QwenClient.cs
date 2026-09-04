@@ -52,7 +52,8 @@ public sealed class QwenClient
 
     public QwenClient(string model = "qwen3.8-max", string mode = "normal", string? token = null, string? s5Token = null, CookieStore? cookieStore = null)
     {
-        Model = model;
+        // Translate darktech aliases (darktech_v1/v2/v3) to upstream Qwen names.
+        Model = ModelMapper.Resolve(model);
         Mode = mode;
 
         // Use an explicit token (e.g. passed via request header) when provided;

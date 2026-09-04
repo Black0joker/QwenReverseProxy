@@ -63,7 +63,7 @@ public sealed class SendPromptRequest
     public List<string>? FileIds { get; set; }
 
     [JsonPropertyName("model")]
-    public string Model { get; set; } = "qwen3.8-max";
+    public string Model { get; set; } = "darktech_v3";
 
     [JsonPropertyName("mode")]
     public string Mode { get; set; } = "normal";
@@ -96,7 +96,7 @@ public sealed class StopCompletionResponse
 public sealed class CreateChatRequest
 {
     [JsonPropertyName("model")]
-    public string Model { get; set; } = "qwen3.8-max";
+    public string Model { get; set; } = "darktech_v3";
 
     [JsonPropertyName("mode")]
     public string Mode { get; set; } = "normal";

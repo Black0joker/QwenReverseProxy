@@ -92,6 +92,10 @@ public sealed class ChatCompletionsController : ControllerBase
     [HttpPost("completions")]
     public async Task Completions([FromBody] SendPromptRequest body, CancellationToken ct)
     {
+        if (!ModelMapper.IsDarktechAlias(body.Model))
+            throw new HttpApiException(400,
+                $"Unsupported model '{body.Model}'. Allowed models: {ModelMapper.AllowedModels}.");
+
         TokenClass tokenClass = TokenSupport.ExtractTokenClass(HttpContext);
         string token = tokenClass.Token;
         var client = new QwenClient(body.Model, body.Mode, token, tokenClass.S5Token, _cookieStore);

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using QwenProxy.Config;
 using QwenProxy.Logging;
+using QwenProxy.Middleware;
 using QwenProxy.Models;
 using QwenProxy.Services;
 
@@ -37,6 +38,10 @@ public sealed class ChatsController : ControllerBase
     public async Task<ActionResult<CreateChatResponse>> CreateChat(
         [FromBody] CreateChatRequest body, CancellationToken ct)
     {
+        if (!ModelMapper.IsDarktechAlias(body.Model))
+            throw new HttpApiException(400,
+                $"Unsupported model '{body.Model}'. Allowed models: {ModelMapper.AllowedModels}.");
+
         var client = TokenSupport.CreateClient(HttpContext, _cookieStore, body.Model, body.Mode);
         string chatId = await client.CreateChatAsync(ct);
         return new CreateChatResponse { ChatId = chatId };
@@ -48,20 +53,25 @@ public sealed class ChatsController : ControllerBase
     public async Task<IActionResult> ChatExists(string chatId, CancellationToken ct)
     {
         var client = TokenSupport.CreateClient(HttpContext, _cookieStore);
-        var chats = await client.FetchChatsAsync(ct);
+        bool exists = await ChatExistsAsync(client, chatId, ct);
+        return new JsonResult(new { Exists = exists });
+    }
 
+    /// <summary>Returns true when a chat with the given id exists upstream.</summary>
+    private static async Task<bool> ChatExistsAsync(QwenClient client, string chatId, CancellationToken ct)
+    {
+        var chats = await client.FetchChatsAsync(ct);
         if (chats is JsonArray chatsArray)
         {
             foreach (var chat in chatsArray)
             {
                 if (chat?["id"]?.GetValue<string>() == chatId)
                 {
-                    return new JsonResult(new { Exists = true });
+                    return true;
                 }
             }
         }
-
-        return new JsonResult(new { Exists = false });
+        return false;
     }
 
     /// <summary>Get chat parent/current ID.</summary>
@@ -99,6 +109,14 @@ public sealed class ChatsController : ControllerBase
     public async Task<IActionResult> UploadCacheChat([FromBody] UploadCacheChatRequest body, CancellationToken ct)
     {
         
+        var client = TokenSupport.CreateClient(HttpContext, _cookieStore);
+
+        // Reject when a chat with this id already exists upstream.
+        if (await ChatExistsAsync(client, body.ChatId, ct))
+        {
+            throw new HttpApiException(400, $"A chat with id '{body.ChatId}' already exists.");
+        }
+
         var cache = new JsonObject
         {
             ["chat_id"] = body.ChatId,
@@ -113,7 +131,6 @@ public sealed class ChatsController : ControllerBase
         // is always available even if the upstream call fails).
         SaveMappedChat(body.ChatId, messagesFormat);
 
-        var client = TokenSupport.CreateClient(HttpContext, _cookieStore);
         await client.UploadChatAsync(messagesFormat, ct);
 
         // Fetch all chats and return the first chat_id (most recently created).
