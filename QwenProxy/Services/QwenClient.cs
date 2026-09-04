@@ -152,7 +152,7 @@ public sealed class QwenClient
         Log.Info("Fetching chat sessions...");
         using var response = await RequestAsync(
             HttpMethod.Get,
-            "https://chat.qwen.ai/api/v2/chats/?page=1&exclude_project=true",
+            "https://chat.qwen.ai/api/v2/chats",
             ct: ct);
         var json = await ReadJsonAsync(response, ct);
         var chats = json?["data"];

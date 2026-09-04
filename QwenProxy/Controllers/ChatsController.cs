@@ -51,7 +51,26 @@ public sealed class ChatsController : ControllerBase
         return new ChatListResponse { Chats = chats };
     }
 
-    
+    /// <summary>Check if a chat exists by its ID.</summary>
+    [HttpGet("{chatId}/exists")]
+    public async Task<IActionResult> ChatExists(string chatId, CancellationToken ct)
+    {
+        var client = TokenSupport.CreateClient(HttpContext, _cookieStore);
+        var chats = await client.FetchChatsAsync(ct);
+
+        if (chats is JsonArray chatsArray)
+        {
+            foreach (var chat in chatsArray)
+            {
+                if (chat?["id"]?.GetValue<string>() == chatId)
+                {
+                    return new JsonResult(new { Exists = true });
+                }
+            }
+        }
+
+        return new JsonResult(new { Exists = false });
+    }
 
     /// <summary>Get chat parent/current ID.</summary>
     [HttpGet("{chatId}/parent")]
