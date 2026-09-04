@@ -87,9 +87,7 @@ public sealed class ChatsController : ControllerBase
     [HttpPost("upload-cache")]
     public async Task<IActionResult> UploadCacheChat([FromBody] UploadCacheChatRequest body, CancellationToken ct)
     {
-        _log.Info($"[DIAG] upload-cache invoked: chat_id={body.ChatId}, messages={body.Messages.Count}");
-
-        // Build the cache JsonObject from the request body fields
+        
         var cache = new JsonObject
         {
             ["chat_id"] = body.ChatId,
@@ -98,15 +96,36 @@ public sealed class ChatsController : ControllerBase
         };
 
         var messagesFormat = ChatCacheMapper.MapToMessagesFormat(cache);
-        _log.Info($"[DIAG] Mapping complete for chat_id={body.ChatId}");
+        _log.Info($"[DIAG] Mapping complete for body.ChatId={body.ChatId}");
 
         // Persist the mapped chat locally for diagnostics (before upload so it
         // is always available even if the upstream call fails).
         SaveMappedChat(body.ChatId, messagesFormat);
 
         var client = TokenSupport.CreateClient(HttpContext, _cookieStore);
-        var data = await client.UploadChatAsync(messagesFormat, ct);
-        return new JsonResult(data);
+        await client.UploadChatAsync(messagesFormat, ct);
+
+        // Fetch all chats and return the first chat_id (most recently created).
+        var chats = await client.FetchChatsAsync(ct);
+        string? firstChatId = null;
+        if (chats is JsonArray chatsArray && chatsArray.Count > 0)
+        {
+            firstChatId = chatsArray[0]?["id"]?.GetValue<string>();
+        }
+
+        _log.Info($"[DIAG] Resolved chat_id from get-all-chats: {firstChatId}");
+
+        // Delete the original chat that was passed in the request body.
+        await client.DeleteChatAsync(body.ChatId, ct);
+        _log.Info($"[DIAG] Deleted previous chat_id={body.ChatId}");
+
+        // Get the parent/current message ID for the newly created chat.
+        string? parentId = firstChatId is not null
+            ? await client.GetChatParentIdAsync(firstChatId, ct)
+            : null;
+        _log.Info($"[DIAG] parent_message_id for {firstChatId}: {parentId}");
+
+        return new JsonResult(new { chat_id = firstChatId, parent_message_id = parentId });
     }
 
     /// <summary>
