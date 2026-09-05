@@ -83,6 +83,9 @@ builder.Services.AddSingleton(_ => new QwenLogger(builder.Environment.ContentRoo
 builder.Services.AddSingleton(sp => new ChatExchangeLogger(
     sp.GetRequiredService<QwenLogger>(), builder.Environment.ContentRootPath));
 
+// Maintenance mode: configurable via appsettings "MaintenanceMode".
+builder.Services.Configure<MaintenanceOptions>(builder.Configuration.GetSection("MaintenanceMode"));
+
 // Rate limiting: sliding windows keyed by the authenticated Qwen token
 // (fallback: client IP). Limits are configurable via appsettings "RateLimiting".
 var rateLimit = builder.Configuration.GetSection("RateLimiting").Get<RateLimitOptions>() ?? new RateLimitOptions();
@@ -139,6 +142,9 @@ QwenLogger.Shared = app.Services.GetRequiredService<QwenLogger>();
 
 // Global exception handling: the proxy ALWAYS answers with a clean JSON payload.
 app.UseMiddleware<ErrorHandlingMiddleware>();
+
+// Maintenance mode: short-circuits all API requests with 503 when enabled.
+app.UseMaintenanceMode();
 
 // AES token decryption: extracts Bearer token, decrypts, parses JSON -> TokenClass.
 app.UseTokenDecryption();
